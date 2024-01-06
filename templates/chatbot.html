@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>D-ID Streaming POC</title>
+<!-- added google fonts -->
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;700&amp;display=swap" rel="stylesheet">
+</head>
+<body>
+
+
+
+<div id="content">
+  <!-- added "id=video-wrapper" -->
+  <div id="video-wrapper">
+    <div>
+      <div id="talk-video">
+        <img id="idel-image" width="200" height="200"
+          src="/static/images/doctor.png">
+
+      </div>
+    </div>
+  </div>
+  <br>
+
+  <!-- added div#buttons -->
+  <div id="buttons">
+    <button id="connect-button" type="button">Connect</button>
+    <button id="talk-button" type="button">Start</button>
+    <button id="destroy-button" type="button">Destroy</button>
+  </div>
+
+  <!-- added div#status -->
+  <div id="status">
+    <!-- removed the wrapping <div> tags -->
+    ICE gathering status: <label id="ice-gathering-status-label" class="iceGatheringState-complete">complete</label><br>
+    ICE status: <label id="ice-status-label" class="iceConnectionState-connected">connected</label><br>
+    Peer connection status: <label id="peer-status-label" class="peerConnectionState-connected">connected</label><br>
+    Signaling status: <label id="signaling-status-label" class="signalingState-stable">stable</label><br>
+    Streaming status: <label id="streaming-status-label" class="streamingState-empty">empty</label><br>
+  </div>
+</div>
+
+<!-- <form  method="post">
+  {% csrf_token %} -->
+  <div class="chat-container">
+    <div id="chat-box">
+      <div class="chat-message">
+        <span class="bot-msg">Hi, 👋 I’m your friendly companion how can i help you</span>
+      </div>
+    </div>
+    <div class="user-input">
+      <input type="text" id="user-message" name="question" placeholder="Type your message...">
+      <button id="myBtn" onclick="sendMessage()">Send</button>
+  
+      <div class="speaker">
+        <button onclick="runSpeechRecog()" style="border: transparent;padding: 0 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" aria-hidden="true" class="w-9 h-9 p-[6px] text-primary">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z">
+                </path>
+            </svg>
+        </button>
+    </div>
+    </div>
+  </div>
+<!-- </form> -->
+
+<div class="backdrop" id="backdrop"></div>
+
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <span class="close" onclick="hidePopup()">&times;</span>
+      <p>Welcome to Medmockinterviewer. Please logIN first if you want to prepare for interview.</p>
+    </div>
+  </div>
+
+  <!-- Add this HTML modal structure to your page -->
+<div class="modal" tabindex="-1" role="dialog" id="rechargeModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Plan Finished</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Your plan is finished. Please recharge to continue.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <!-- Add a button here for the user to recharge -->
+        <button type="button" class="btn btn-primary" onclick="rechargePlan()">Recharge</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add this script to your page to handle modal display -->
+<script>
+  function displayErrorMessage(message) {
+    const errorMessageElement = document.getElementById('error-message');
+    if (errorMessageElement) {
+      errorMessageElement.textContent = message;
+    } else {
+      console.error('Error message element not found.');
+    }
+
+    // Check if the error message indicates plan finished, and show the modal
+    if (message.includes('Your plan is finished')) {
+      $('#rechargeModal').modal('show');
+    }
+  }
+
+  // Example function for recharging the plan (modify as needed)
+  function rechargePlan() {
+    console.log('Recharge your plan logic here.');
+    // You can redirect the user to the recharge page or trigger any other recharge action.
+    // For now, just close the modal.
+    $('#rechargeModal').modal('hide');
+  }
+</script>
+
+
+<script>
+  runSpeechRecog = () => {
+    var questionInput = document.getElementById('user-message');
+    var action = document.getElementById('action');
+
+    questionInput.value = "";
+
+    let recognition = new webkitSpeechRecognition();
+    recognition.onstart = () => {
+        action.innerHTML = "Listening...";
+    }
+    recognition.onresult = (e) => {
+        var transcript = e.results[0][0].transcript;
+        questionInput.value = transcript;
+        action.innerHTML = "";
+    }
+    recognition.start();
+}
+</script>
+
+
+
+
+<script>
+
+function showPopup() {
+    var backdrop = document.getElementById('backdrop');
+    var popup = document.getElementById('popup');
+    backdrop.style.display = 'block';
+    popup.style.display = 'block';
+  }
+  
+  function hidePopup() {
+    var backdrop = document.getElementById('backdrop');
+    var popup = document.getElementById('popup');
+    backdrop.style.display = 'none';
+    popup.style.display = 'none';
+  }
+
+  'use strict';
+  //import DID_API from './api.json' assert { type: 'json' };
+  const DID_API = {
+    "key": "DID_KEY",
+    "url": "https://api.d-id.com"
+  }
+
+  if (DID_API.key == '🤫') alert('Please put your api key inside ./api.json and restart..');
+
+  const RTCPeerConnection = (
+    window.RTCPeerConnection ||
+    window.webkitRTCPeerConnection ||
+    window.mozRTCPeerConnection
+  ).bind(window);
+
+  let peerConnection;
+  let streamId;
+  let sessionId;
+  let sessionClientAnswer;
+
+  let statsIntervalId;
+  let videoIsPlaying;
+  let lastBytesReceived;
+
+  // Step 1: Create the video element
+  const talkVideo = document.createElement('video');
+
+  // Step 2: Set attributes for the video element
+  talkVideo.id = 'stream-video';
+  talkVideo.width = 200;
+  talkVideo.height = 200;
+  talkVideo.autoplay = true;
+  talkVideo.playsInline = true;
+  talkVideo.setAttribute('playsinline', '');
+  const peerStatusLabel = document.getElementById('peer-status-label');
+  const iceStatusLabel = document.getElementById('ice-status-label');
+  const iceGatheringStatusLabel = document.getElementById('ice-gathering-status-label');
+  const signalingStatusLabel = document.getElementById('signaling-status-label');
+  const streamingStatusLabel = document.getElementById('streaming-status-label');
+
+  const connectButton = document.getElementById('connect-button');
+  const authToken = localStorage.getItem("authToken");
+  console.log("authToken",authToken)
+  const startConnection = async () => {
+
+    //connectButton.onclick = async () => {
+    if (peerConnection && peerConnection.connectionState === 'connected') {
+      return;
+    }
+
+    stopAllStreams();
+    closePC();
+
+    const sessionResponse = await fetchWithRetries(`${DID_API.url}/talks/streams`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${DID_API.key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        source_url: 'https://raw.githubusercontent.com/Gavin-Thomas/MMI-Image-Housing/main/doctor.png',
+      }),
+    });
+
+    const { id: newStreamId, offer, ice_servers: iceServers, session_id: newSessionId } = await sessionResponse.json();
+    streamId = newStreamId;
+    sessionId = newSessionId;
+
+    try {
+      sessionClientAnswer = await createPeerConnection(offer, iceServers);
+    } catch (e) {
+      console.log('error during streaming setup', e);
+      stopAllStreams();
+      closePC();
+      return;
+    }
+
+    const sdpResponse = await fetch(`${DID_API.url}/talks/streams/${streamId}/sdp`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${DID_API.key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        answer: sessionClientAnswer,
+        session_id: sessionId,
+      }),
+    });
+  };
+
+  const talkButton = document.getElementById('talk-button');
+  const handleVideoResponse = async (input) => {
+    // connectionState not supported in firefox
+    console.log("called>>>>")
+    let talkResponse;
+    if (peerConnection?.signalingState === 'stable' || peerConnection?.iceConnectionState === 'connected') {
+      talkResponse = await fetchWithRetries(`${DID_API.url}/talks/streams/${streamId}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Basic ${DID_API.key}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "script": {
+            "type": "text",
+            "input": input,
+            "ssml": true,
+            "provider": {
+              "type": "microsoft",
+              "voice_id": "en-US-AndrewNeural",
+              "voice_config": {
+                "style": "string",
+                "rate": "0.9",
+                "pitch": "+0st",
+              }
+            },
+          },
+          presenter_id: "amy-jcwCkr1grs",
+          driver_id: "uM00QMwJ9x",
+          driver_url: 'bank://lively/',
+          background: {
+            color: false
+          },
+          config: {
+            stitch: true,
+          },
+          session_id: sessionId,
+        }),
+      });
+    }
+    return talkResponse
+  };
+
+  const destroyButton = document.getElementById('destroy-button');
+  destroyButton.onclick = async () => {
+    await fetch(`${DID_API.url}/talks/streams/${streamId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Basic ${DID_API.key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+
+    stopAllStreams();
+    closePC();
+  };
+
+  function onIceGatheringStateChange() {
+    iceGatheringStatusLabel.innerText = peerConnection.iceGatheringState;
+    iceGatheringStatusLabel.className = 'iceGatheringState-' + peerConnection.iceGatheringState;
+  }
+  function onIceCandidate(event) {
+    console.log('onIceCandidate', event);
+    if (event.candidate) {
+      const { candidate, sdpMid, sdpMLineIndex } = event.candidate;
+
+      fetch(`${DID_API.url}/talks/streams/${streamId}/ice`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Basic ${DID_API.key}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          candidate,
+          sdpMid,
+          sdpMLineIndex,
+          session_id: sessionId,
+        }),
+      });
+    }
+  }
+  function onIceConnectionStateChange() {
+    iceStatusLabel.innerText = peerConnection.iceConnectionState;
+    iceStatusLabel.className = 'iceConnectionState-' + peerConnection.iceConnectionState;
+    if (peerConnection.iceConnectionState === 'failed' || peerConnection.iceConnectionState === 'closed') {
+      stopAllStreams();
+      closePC();
+    }
+  }
+  function onConnectionStateChange() {
+    // not supported in firefox
+    peerStatusLabel.innerText = peerConnection.connectionState;
+    peerStatusLabel.className = 'peerConnectionState-' + peerConnection.connectionState;
+  }
+  function onSignalingStateChange() {
+    signalingStatusLabel.innerText = peerConnection.signalingState;
+    signalingStatusLabel.className = 'signalingState-' + peerConnection.signalingState;
+  }
+
+  function onVideoStatusChange(videoIsPlaying, stream) {
+    console.log("onVideoStatusChange")
+    let status;
+    if (videoIsPlaying) {
+      status = 'streaming';
+      const remoteStream = stream;
+      setVideoElement(remoteStream);
+    } else {
+      status = 'empty';
+      playIdleVideo();
+    }
+    streamingStatusLabel.innerText = status;
+    streamingStatusLabel.className = 'streamingState-' + status;
+  }
+
+  function onTrack(event) {
+   
+
+    if (!event.track) return;
+
+    statsIntervalId = setInterval(async () => {
+      const stats = await peerConnection.getStats(event.track);
+      stats.forEach((report) => {
+        if (report.type === 'inbound-rtp' && report.mediaType === 'video') {
+          const videoStatusChanged = videoIsPlaying !== report.bytesReceived > lastBytesReceived;
+
+          if (videoStatusChanged) {
+            videoIsPlaying = report.bytesReceived > lastBytesReceived;
+            onVideoStatusChange(videoIsPlaying, event.streams[0]);
+          }
+          lastBytesReceived = report.bytesReceived;
+        }
+      });
+    }, 500);
+  }
+
+  async function createPeerConnection(offer, iceServers) {
+    if (!peerConnection) {
+      peerConnection = new RTCPeerConnection({ iceServers });
+      peerConnection.addEventListener('icegatheringstatechange', onIceGatheringStateChange, true);
+      peerConnection.addEventListener('icecandidate', onIceCandidate, true);
+      peerConnection.addEventListener('iceconnectionstatechange', onIceConnectionStateChange, true);
+      peerConnection.addEventListener('connectionstatechange', onConnectionStateChange, true);
+      peerConnection.addEventListener('signalingstatechange', onSignalingStateChange, true);
+      peerConnection.addEventListener('track', onTrack, true);
+    }
+
+    await peerConnection.setRemoteDescription(offer);
+    console.log('set remote sdp OK');
+
+    const sessionClientAnswer = await peerConnection.createAnswer();
+    console.log('create local sdp OK');
+
+    await peerConnection.setLocalDescription(sessionClientAnswer);
+    console.log('set local sdp OK');
+
+    return sessionClientAnswer;
+  }
+
+  function setVideoElement(stream) {
+    if (document.getElementById("stream-video")) {
+      console.log("elementExists")
+    }
+    else {
+      const videoParent = document.getElementById("talk-video");
+      const idleImage = document.getElementById("idel-image");
+      if (idleImage) {
+        videoParent.replaceChild(talkVideo, idleImage);
+      }
+    }
+
+    if (!stream) return;
+    talkVideo.srcObject = stream;
+    talkVideo.loop = false;
+
+    // safari hotfix
+    if (talkVideo.paused) {
+      talkVideo
+        .play()
+        .then((_) => { })
+        .catch((e) => { });
+    }
+  }
+
+  function playIdleVideo() {
+    const videoParent = document.getElementById("talk-video");
+    const idleImage = document.getElementById("idel-image");
+    const idleImagenew = document.createElement('img');
+
+    // Step 2: Set attributes for the image element
+    idleImagenew.id = 'idel-image';
+    idleImagenew.width = 200;
+    idleImagenew.height = 200;
+    idleImagenew.src = 'https://raw.githubusercontent.com/Gavin-Thomas/MMI-Image-Housing/main/doctor.png'; // Replace 'idle.png' with the actual path to your image file
+
+    console.log("playing idle video");
+    if (!idleImage) {
+      videoParent.removeChild(talkVideo);
+      videoParent.appendChild(idleImagenew);
+    };
+  }
+
+  function stopAllStreams() {
+
+    if (talkVideo.srcObject) {
+      console.log('stopping video streams');
+      talkVideo.srcObject.getTracks().forEach((track) => track.stop());
+      talkVideo.srcObject = null;
+    }
+  }
+
+  function closePC(pc = peerConnection) {
+    if (!pc) return;
+    console.log('stopping peer connection');
+    pc.close();
+    pc.removeEventListener('icegatheringstatechange', onIceGatheringStateChange, true);
+    pc.removeEventListener('icecandidate', onIceCandidate, true);
+    pc.removeEventListener('iceconnectionstatechange', onIceConnectionStateChange, true);
+    pc.removeEventListener('connectionstatechange', onConnectionStateChange, true);
+    pc.removeEventListener('signalingstatechange', onSignalingStateChange, true);
+    pc.removeEventListener('track', onTrack, true);
+    clearInterval(statsIntervalId);
+    iceGatheringStatusLabel.innerText = '';
+    signalingStatusLabel.innerText = '';
+    iceStatusLabel.innerText = '';
+    peerStatusLabel.innerText = '';
+    console.log('stopped peer connection');
+    if (pc === peerConnection) {
+      peerConnection = null;
+    }
+  }
+
+  const maxRetryCount = 3;
+  const maxDelaySec = 4;
+
+  async function fetchWithRetries(url, options, retries = 1) {
+    try {
+      return await fetch(url, options);
+    } catch (err) {
+      if (retries <= maxRetryCount) {
+        const delay = Math.min(Math.pow(2, retries) / 4 + Math.random(), maxDelaySec) * 1000;
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+
+        console.log(`Request failed, retrying ${retries}/${maxRetryCount}. Error ${err}`);
+        return fetchWithRetries(url, options, retries + 1);
+      } else {
+        throw new Error(`Max retries exceeded. error: ${err}`);
+      }
+    }
+  }
+
+// Function to get CSRF token from cookies
+function getCSRFToken() {
+  const cookieValue = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('csrftoken='))
+    .split('=')[1];
+  return cookieValue;
+}
+
+// Update your fetch requests to include the CSRF token in the headers
+async function getChatResponse(prompt) {
+  const csrfToken = getCSRFToken();
+  const authToken = localStorage.getItem('auth_token');
+
+  if (!authToken) {
+    const errorMessage = 'Please log in first.';
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",errorMessage)
+    showPopup()
+    // displayErrorMessage(errorMessage); 
+    return "Please Login First";
+  }
+
+  var formdata = new FormData();
+  formdata.append("question", prompt);
+
+  var requestOptions = {
+    method: 'POST',
+    body: formdata,
+    redirect: 'follow',
+    headers: {
+       'X-CSRFToken': csrfToken,
+       'Authorization': `Token ${authToken}` 
+     }
+  };
+
+  try {
+    console.log("apihithere>>>>>>")
+    const response = await fetch("/ask/", requestOptions);
+    if (!response.ok) {
+      throw new Error('API request failed with status: ' + response.status);
+    }
+
+    const result = await response.json();
+    const threadId = result.thread_id;
+    console.log("response>>>", result.response)
+    console.log("Thread ID:", threadId);
+
+    return result.response;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return 'Sorry, an error occurred while fetching data.';
+  }
+}
+function displayErrorMessage(message) {
+  // Modify this function to display the error message on the screen
+  // For example, update a DOM element with the error message
+  const errorMessageElement = document.getElementById('error-message');
+  if (errorMessageElement) {
+    errorMessageElement.textContent = message;
+  } else {
+    console.error('Error message element not found.');
+  }
+}
+
+// Call getChatResponse function within sendMessage() and other relevant parts of your code.
+// Ensure you handle the CSRF token when making other API requests as well.
+
+  
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+
+  async function sendMessage() {
+    const loaderOuter = document.createElement('div');
+    loaderOuter.className = 'loader_outer';
+    loaderOuter.id = 'loader_outer_id';
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner';
+
+    const bounce1 = document.createElement('div');
+    bounce1.className = 'bounce1';
+
+    const bounce2 = document.createElement('div');
+    bounce2.className = 'bounce2';
+
+    const bounce3 = document.createElement('div');
+    bounce3.className = 'bounce3';
+
+    spinner.appendChild(bounce1);
+    spinner.appendChild(bounce2);
+    spinner.appendChild(bounce3);
+
+    loaderOuter.appendChild(spinner);
+    startConnection();
+    const userMessage = document.getElementById("user-message").value;
+    appendMessage(userMessage, "user");
+    const chatBox = document.getElementById("chat-box");
+    chatBox.appendChild(loaderOuter);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    let gptResponse = await getChatResponse(userMessage);
+    console.log("gptresponse>>>>", gptResponse)
+
+    await wait(2000);
+
+    if (peerConnection && peerConnection.connectionState === 'connected') {
+      await handleVideoResponse(gptResponse)
+    } else {
+      await wait(2000);
+      await handleVideoResponse(gptResponse)
+    }
+
+
+
+    sendResponse(gptResponse);
+  }
+
+  var input = document.getElementById("user-message");
+  input.addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      document.getElementById("myBtn").click();
+    }
+  });
+
+
+  function sendResponse(response) {
+    appendMessage(response, "bot");
+  }
+
+  function appendMessage(message, sender) {
+    const chatBox = document.getElementById("chat-box");
+    const chatMessage = document.createElement("div");
+    chatMessage.classList.add("chat-message");
+
+    if (sender === "user") {
+      chatMessage.innerHTML = `<span class="user-msg">${message}</span>`;
+    } else {
+      let loaderOuter = document.getElementById("loader_outer_id")
+      loaderOuter.remove()
+      chatMessage.innerHTML = `<span class="bot-msg">${message}</span>`;
+    }
+
+    chatBox.appendChild(chatMessage);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    document.getElementById("user-message").value = "";
+  }
+
+</script>
+
+</body>
+
+</html>

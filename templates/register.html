@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Style the button */
+        #togglePassword {
+        cursor: pointer;
+        border: none;
+        background-color: transparent;
+        outline: none;
+        }
+
+        /* Style the input field */
+        #password {
+        padding: 10px;
+        }
+        .inner_fild {
+        position: relative;
+        }
+        .show_pass {
+        position: absolute;
+        top: 20px;
+        right: 15px;
+        }
+        .input input[type="text"], input[type="email"], input[type="password"] {
+        box-sizing: border-box;
+        width: 100%;
+        }
+        .inner_fild input#password1 {
+         padding-right: 70px;
+        }
+        .input input[type="submit"] {
+            font-size: 17px;
+            font-weight: 400;
+            text-transform: uppercase;
+            display: inline-block;
+            padding: 17px 25px;
+            background: #2398ca;
+            color: #fff;
+            border: none;
+            margin-top: 29px;
+            border-radius: 3px;
+            min-width: 240px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header class="full-width">
+        <div class="container header_wrap">
+           <div class="logo">
+                <img src="/static/images/logo.png" style="width:100%; height:100%;"/>
+           </div> 
+           <div class="nav_bar">
+                <ul>
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/">Features</a>
+                    </li>
+                    <li>
+                        <a href="/">Pricing</a>
+                    </li>
+                    <li>
+                        <a href="/chatbot/">chatbot</a>
+                    </li>
+                    <li>
+                        <a href="/terms-conditions/">Register</a>
+                    </li>
+                    
+                    <li>
+                         <a href="/sign-up/">Login</a>
+                    </li>
+                    
+                </ul>
+           </div>
+           
+        </div>
+    </header>
+   
+    <section class ="full-width register">
+        <div class="container">
+            <div class="sec-head">
+                <h2>Register Now</h2>
+            </div>
+            <form action="/signup/" method="POST"> 
+                {% csrf_token %}
+                
+                <div class="register-form">
+                    <div class="input">
+                        <label>First Name</label>
+                    <input type="text" name="first_name" placeholder="Johan" required> 
+                </div>
+                    <div class="input">
+                        <label>last Name</label>
+                    <input type="text" name="last_name" placeholder="William" required>
+                </div>
+                    <div class="input">
+                        <label>Email</label>
+                    <input type="email" name="email" placeholder="jo@gmail.com" required>
+                </div>
+                    <div class="input">
+                        <label>Password</label>
+                    <div class="inner_fild">
+                    <input type="password" name="password" id="password1" placeholder="i.e hello@123" required>
+                    
+                    <div class="show_pass">
+                        <button type="button" id="togglePassword" onclick="togglePasswordFields()">
+                            <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+                            <svg width="25px" height="25px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 14C3 9.02944 7.02944 5 12 5C16.9706 5 21 9.02944 21 14M17 14C17 16.7614 14.7614 19 12 19C9.23858 19 7 16.7614 7 14C7 11.2386 9.23858 9 12 9C14.7614 9 17 11.2386 17 14Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                </div>
+                    <div class="input">
+                        <label>Confirm Password</label>
+                    <input type="password" name="password2" id="password2" placeholder="" required>
+                </div>
+                
+                <div class="input">
+                   
+                <input type="submit" Value="SUBMIT" placeholder="">
+            </div>
+            {% if messages %}
+        <div class="error-messages">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+                
+
+            </div>
+            </form>
+        </div>
+
+    </section>
+
+    <footer class="full-width footer-bg">
+        <div class="container">
+            <div class="footer_wrap">
+                <div class="footer_left">
+                    <div class="footer_logo">
+                        <img src="/static/images/logo.png">
+                    </div>
+                    <div class="footer_content">
+                        <p></p>
+
+                    </div>
+                </div>
+                <div class="footer_center">
+                    <h3>Quick Links</h3>
+                   <div class="links"> <ul>
+                        <li>
+                            <a href="/privacy-policy/"> Privacy Policy</a>
+                        </li>
+                        <li>
+                            <a href="/terms-conditions/"> Terms & Condition</a>
+                        </li>
+                        <li>
+                            <a href="#"> Contact Us</a>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+                <div class="footer_right">
+                    <h3>Get In Touch</h3>
+                    <div class="links">
+                        <ul><li><a href="#"></a></li>
+                        <li><a href="#">medmockinterviewer@gmail.com</a></li>
+                  
+                        </ul>
+                   </div>
+                  <div class="social"> <ul>
+                    <li><a href="http://www.youtube.com/@MedMockInterviewer"><i class="fa-brands fa-youtube"></i></a></li>
+                    <li><a href="https://www.instagram.com/med_mock_interview/?utm_source=ig_web_button_share_sheet&igshid=OGQ5ZDc2ODk2ZA=="><i class="fa-brands fa-instagram"></i></a></li>
+                    <li><a href="https://www.tiktok.com/@medmockinterview"><i class="fa-brands fa-tiktok"></i></a></li>
+                   </ul>
+                   </div>
+                </div>
+            </div>
+            <div class="copy_right">
+                Copyright © <a href="#">MOCK INTERVIEWER</a> All rights reserved.
+            </div>
+        </div>
+
+    </footer>
+    <script>
+        function togglePasswordFields() {
+            var passwordField1 = document.getElementById("password1");
+            var passwordField2 = document.getElementById("password2");
+            var toggleButton = document.getElementById("togglePassword");
+    
+            // Toggle the type attribute of the password fields
+            if (passwordField1.type === "password") {
+                passwordField1.type = "text";
+                passwordField2.type = "text";
+                toggleButton.innerHTML = createSvgContent("M9.60997 9.60714C8.05503 10.4549 7 12.1043 7 14C7 16.7614 9.23858 19 12 19C13.8966 19 15.5466 17.944 16.3941 16.3878M21 14C21 9.02944 16.9706 5 12 5C11.5582 5 11.1238 5.03184 10.699 5.09334M3 14C3 11.0069 4.46104 8.35513 6.70883 6.71886M3 3L21 21");
+                } else {
+                    passwordField1.type = "password";
+                    passwordField2.type = "password";
+                    toggleButton.innerHTML = createSvgContent("M3 14C3 9.02944 7.02944 5 12 5C16.9706 5 21 9.02944 21 14M17 14C17 16.7614 14.7614 19 12 19C9.23858 19 7 16.7614 7 14C7 11.2386 9.23858 9 12 9C14.7614 9 17 11.2386 17 14Z");
+                }
+            }
+
+            function createSvgContent(pathData) {
+                var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("width", "25");
+                svg.setAttribute("height", "25");
+                svg.setAttribute("viewBox", "0 0 24 24");
+                svg.setAttribute("fill", "none");
+
+                var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", pathData);
+                path.setAttribute("stroke", "#000000");
+                path.setAttribute("stroke-width", "2");
+                path.setAttribute("stroke-linecap", "round");
+                path.setAttribute("stroke-linejoin", "round");
+
+                svg.appendChild(path);
+                return svg.outerHTML;
+        }
+    </script>
+    </body>
+    </html>
